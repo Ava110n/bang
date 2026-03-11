@@ -37,7 +37,7 @@ import kotlinproject.composeapp.generated.resources.compose_multiplatform
 @Composable
 @Preview
 fun App() {
-    var screen = Status(Screens.LOGIN)
-
+    val screen = Status(Screens.LOGIN)
     authorization(screen)
+    registration(screen)
 }
