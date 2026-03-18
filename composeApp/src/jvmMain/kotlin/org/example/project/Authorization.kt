@@ -1,5 +1,6 @@
 package org.example.project
 
+import androidx.compose.foundation.ScrollbarAdapter
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,6 +21,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import org.example.project.entity.User
+import org.example.project.errors.NoSuchUserException
+import org.example.project.errors.WrongPasswordException
 import org.example.project.repository.UserRepository
 
 @Composable
@@ -28,13 +31,14 @@ fun authorization(status: Status, repository: UserRepository) {
         return
     var login by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-
+    var message: String by remember { mutableStateOf("") }
     Box(modifier = Modifier.background(Color.LightGray)) {
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Text(message)
             TextField(
                 value = login, onValueChange = { newText -> login = newText },
                 placeholder = { Text("Логин") })
@@ -52,13 +56,32 @@ fun authorization(status: Status, repository: UserRepository) {
                 }
                 Column {
                     TextButton(onClick = {
-                        val user = repository.login(User(login, "", password))
-                        if (user.login == "") return@TextButton
+                        try {
+                            val user = repository.login(User(login, "", password))
+                            status.screens = Screens.ACCOUNT
+                            status.userInfo = user
+                        } catch (e: WrongPasswordException) {
+                            if (e.message != null)
+                                message = e.message!!
+                            return@TextButton
+                        } catch (e: NoSuchUserException) {
+                            if (e.message != null)
+                                message = e.message!!
+                        }
 
                     }, shape = RectangleShape) {
                         Text("Войти")
                     }
                 }
+                Column {
+                    TextButton(onClick = {
+                        status.screens = Screens.FORGET
+
+                    }, shape = RectangleShape) {
+                        Text("Восстановить аккаунт")
+                    }
+                }
+
             }
         }
     }

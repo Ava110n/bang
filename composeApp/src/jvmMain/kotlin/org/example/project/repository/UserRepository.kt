@@ -1,6 +1,8 @@
 package org.example.project.repository
 
 import org.example.project.entity.User
+import org.example.project.errors.NoSuchUserException
+import org.example.project.errors.WrongPasswordException
 import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.SQLException
@@ -27,7 +29,7 @@ class UserRepository {
                 it.execute(sql)
             }
         } catch (e: SQLException) {
-            println(e)
+            println("init tables $e")
         }
     }
 
@@ -50,23 +52,46 @@ class UserRepository {
         return false
     }
 
+    fun updatePassword(user: User): Boolean {
+        val sql = """
+            UPDATE users
+            SET password = ?
+            WHERE login = ?;
+        """.trimIndent()
+        try {
+            con.prepareStatement(sql).use {
+                it.setString(1, user.password.trim())
+                it.setString(2, user.login.trim())
+                println(it.toString())
+                return it.executeUpdate() > 0
+            }
+        } catch (e: SQLException) {
+            println(e)
+        }
+        return false
+    }
+
     fun login(user: User): User {
         val sql = """
-            SELECT login, name, password
+            SELECT login, name, password = ?
             FROM users
-            WHERE login = ? AND password = ?
+            WHERE login = ?
             LIMIT 1
         """.trimIndent()
         try {
             con.prepareStatement(sql).use { it1 ->
-                it1.setString(1, user.login)
-                it1.setString(2, user.password)
+                it1.setString(1, user.password)
+                it1.setString(2, user.login)
                 it1.executeQuery().use {
                     if (it.next()) {
+                        if (!it.getBoolean(3)) {
+                           throw WrongPasswordException()
+                        }
+
                         return User(
                             it.getString(1),
                             it.getString(2),
-                            it.getString(3),
+                            ""
                         )
                     }
                 }
@@ -74,6 +99,6 @@ class UserRepository {
         } catch (e: SQLException) {
             println(e)
         }
-        return User("", "", "")
+        throw NoSuchUserException(user.login)
     }
 }

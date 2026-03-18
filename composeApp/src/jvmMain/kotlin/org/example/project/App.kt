@@ -12,11 +12,13 @@ import org.example.project.repository.UserRepository
 fun App() {
     val screen = Status(Screens.LOGIN)
     val repository = UserRepository(
-        "jdbc:postgresql://localhost:5432/Bank",
+        "jdbc:postgresql://localhost:5432/gang05306",
         "postgres",
         "1111",
     )
     repository.initTables()
     authorization(screen, repository)
     registration(screen, repository)
+    account(screen, repository)
+    forget(screen, repository)
 }
