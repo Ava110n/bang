@@ -19,33 +19,43 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import org.example.project.entity.User
+import org.example.project.repository.UserRepository
 
 @Composable
-fun authorization(status: Status) {
+fun authorization(status: Status, repository: UserRepository) {
     if (status.screens != Screens.LOGIN)
         return
     var login by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
     Box(modifier = Modifier.background(Color.LightGray)) {
-        Column(modifier = Modifier.fillMaxSize(),
+        Column(
+            modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally){
-            TextField(value = login, onValueChange = {newText -> login = newText},
-                placeholder = {Text("Логин")})
-            TextField(value = password, onValueChange = {newText -> password = newText},
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            TextField(
+                value = login, onValueChange = { newText -> login = newText },
+                placeholder = { Text("Логин") })
+            TextField(
+                value = password, onValueChange = { newText -> password = newText },
                 visualTransformation = PasswordVisualTransformation('*'),
-                placeholder = {Text("Пароль")})
+                placeholder = { Text("Пароль") })
             /*SecureTextField(state = state,
                 placeholder = {Text("Пароль")})*/
-            Row(horizontalArrangement = Arrangement.SpaceBetween){
+            Row(horizontalArrangement = Arrangement.SpaceBetween) {
                 Column {
-                    TextButton(onClick = {status.screens = Screens.REGISTRATION}, shape = RectangleShape) {
+                    TextButton(onClick = { status.screens = Screens.REGISTRATION }, shape = RectangleShape) {
                         Text("Создать аккаунт")
                     }
                 }
                 Column {
-                    TextButton(onClick = {}, shape = RectangleShape) {
+                    TextButton(onClick = {
+                        val user = repository.login(User(login, "", password))
+                        if (user.login == "") return@TextButton
+
+                    }, shape = RectangleShape) {
                         Text("Войти")
                     }
                 }

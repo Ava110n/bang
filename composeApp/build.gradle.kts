@@ -9,7 +9,7 @@ plugins {
 
 kotlin {
     jvm()
-    
+
     sourceSets {
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -27,6 +27,7 @@ kotlin {
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
+            implementation("org.postgresql:postgresql:42.7.8")
         }
     }
 }
@@ -42,4 +43,9 @@ compose.desktop {
             packageVersion = "1.0.0"
         }
     }
+}
+
+
+dependencies {
+//
 }

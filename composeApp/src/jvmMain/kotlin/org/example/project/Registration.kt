@@ -18,9 +18,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import org.example.project.entity.User
+import org.example.project.repository.UserRepository
+import kotlin.math.log
 
 @Composable
-fun registration(status: Status) {
+fun registration(status: Status, repository: UserRepository) {
     if (status.screens != Screens.REGISTRATION)
         return
     var name by remember { mutableStateOf("") }
@@ -51,7 +54,12 @@ fun registration(status: Status) {
                 visualTransformation = PasswordVisualTransformation('*'),
                 label = { Text("Подтвердите пароль") })
 
-            TextButton(onClick = {}, shape = RectangleShape) {
+            TextButton(onClick = {
+                if (password != passwordConfirm) {
+                    return@TextButton
+                }
+                val b = repository.addUser(User(login, name, password))
+            }, shape = RectangleShape) {
                 Text("Зарегистрироваться")
             }
         }
