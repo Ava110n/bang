@@ -41,6 +41,7 @@ fun App() {
     val db = DataBase()
     //db.drop()
     db.create()
+    val user = null
     authorization(status, db)
     registration(status, db)
     profile(status, db)
