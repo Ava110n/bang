@@ -20,6 +20,7 @@ kotlin {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+            implementation("org.postgresql:postgresql:42.7.8")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
